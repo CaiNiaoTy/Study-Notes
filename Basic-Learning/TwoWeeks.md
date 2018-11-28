@@ -448,7 +448,9 @@
       
     15）合并分支：
               
-      > git merge <分支名>    
+      > git merge <分支名> 
+      
+   ![](https://static.oschina.net/uploads/space/2017/0910/101257_bfXs_2945455.jpg)
       
 ---
 ## 七.Kubernetes
