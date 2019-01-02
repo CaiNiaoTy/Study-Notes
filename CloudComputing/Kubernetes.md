@@ -15,5 +15,5 @@
   
   3. Pod 容器共享 Volume
     
-    - 
+    - 同一个 Pod 中的多个容器能够共享 Pod 级别的存储卷 Volume。
     
