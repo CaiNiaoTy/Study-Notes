@@ -35,3 +35,9 @@
   
   ②. 将本地文件或目录拷贝到远程服务器的目录中
   > scp [-r] [local directory path] [user name]@[server name]:[server directory path]
+
+四. Linux 下的挂载
+--- 
+  > 先解释分区，分区指的是将硬盘进行分隔，是硬件层面！所谓挂载就是在windows下进行“分区”操作，而再 linux 系统下则是将‘分区’和对应的目录惊醒绑定操作。
+  
+  > 盘符——是软件级的概念；分区——是硬件级的概念；这个“分配盘符”的过程，就是挂载（mount）过程（请一定记住这个mount）
