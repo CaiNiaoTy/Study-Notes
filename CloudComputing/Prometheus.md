@@ -67,3 +67,66 @@
 
     > http_request_total{} offset 5m
     > http_request_total{}[1d] offset 1d
+
+二. Prometheus 告警处理
+---
+  - 本章我们将带领读者探索Prometheus的告警处理机制，在前面的部分中已经介绍了告警能力在Prometheus的架构中被划分为两个部分，在Prometheus Server中定义告警规则以及产生告警，Alertmanager组件则用于处理这些由Prometheus产生的告警。Alertmanager即Prometheus体系中告警的统一处理中心。Alertmanager提供了多种内置第三方告警通知方式，同时还提供了对Webhook通知的支持，通过Webhook用户可以完成对告警更多个性化的扩展。
+  
+  1. Prometheus 的告警处理流程：
+  
+  ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LBdoxo9EmQ0bJP2BuUi%2F-LPS9OCY3C6XBe9KTNE4%2F-LPS9QhUbi37E1ZK8mXF%2Fprometheus-alert-artich.png?generation=1540235056680444&alt=media)
+  
+  2. 告警规则主要有以下部分组成：
+    - 告警名称：用户需要为告警规则命名，当然对于命名而言，需要能够直接表达出该告警的主要内容
+    
+    - 告警规则：告警规则实际上主要由PromQL进行定义，其实际意义是当表达式（PromQL）查询结果持续多长时间（During）后出发告警
+  
+  3.Alertmanager特性:
+  
+    - Alertmanager除了提供基本的告警通知能力以外，还主要提供了如：分组、抑制以及静默等告警特性：
+    
+  ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LBdoxo9EmQ0bJP2BuUi%2F-LPS9OCY3C6XBe9KTNE4%2F-LPS9QhWQUhAIdLAiEfH%2Falertmanager-features.png?generation=1540235050688808&alt=media)
+  
+  - 自定义告警规则
+    
+      groups:
+      
+      - name: example
+      
+        rules:
+        
+        - alert: HighErrorRate
+        
+          expr: job:request_latency_seconds:mean5m{job="myjob"} > 0.5
+          
+          for: 10m
+          
+          labels:
+          
+          severity: page
+          
+        annotations:
+        
+          summary: High request latency
+          
+          description: description info
+    
+    在告警规则文件中，我们可以将一组相关的规则设置定义在一个group下。在每一个group中我们可以定义多个告警规则(rule)。一条告警规则主要由以下几部分组成：
+
+        alert：告警规则的名称。
+
+        expr：基于PromQL表达式告警触发条件，用于计算是否有时间序列满足该条件。
+
+        for：评估等待时间，可选参数。用于表示只有当触发条件持续一段时间后才发送告警。在等待期间新产生告警的状态为pending。
+
+        labels：自定义标签，允许用户指定要附加到告警上的一组附加标签。
+
+        annotations：用于指定一组附加信息，比如用于描述告警详细信息的文字等，annotations的内容在告警产生时会一同作为参数发送到Alertmanager。
+    
+    1. 为了能够让Prometheus能够启用定义的告警规则，我们需要在Prometheus全局配置文件中通过rule_files指定一组告警规则文件的访问路径，Prometheus启动后会自动扫描这些路径下规则文件中定义的内容，并且根据这些规则计算是否向外部发送通知
+    
+      rule_files:
+    
+        [ - <filepath_glob> ... ]
+    
+    2.       
