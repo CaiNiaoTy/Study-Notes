@@ -54,3 +54,18 @@
 二. Webhook
 ---
   1. Webhook，也就是人们常说的钩子，是一个很有用的工具。你可以通过定制 Webhook 来监测你在 Github.com 上的各种事件，最常见的莫过于 push 事件。如果你设置了一个监测 push 事件的 Webhook，那么每当你的这个项目有了任何提交，这个 Webhook 都会被触发，这时 Github 就会发送一个 HTTP POST 请求到你配置好的地址。
+
+2019.1.11
+---
+
+一. deepin 系统安装 docker-ce
+--- 
+
+  [docker-ce 官网安装教程](https://docs.docker.com/install/linux/docker-ce/debian/)
+  
+  > 注意：前面几步完成好之后，要修改配置文件 /etc/apt/sources.list 将 unstable 改为 wheezy
+
+二. deepin ssh连接不上
+--- 
+  [网络教程](https://www.jianshu.com/p/9b6bd8b91616)
+
