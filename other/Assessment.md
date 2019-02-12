@@ -86,3 +86,10 @@
 
 - 删除环境变量的配置
 - 删除安装文件夹
+
+**问题：**
+
+1. ”Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this.  Please add this host's fingerprint to your known_hosts file to manage this host“
+
+解决方案：
+在 ansible.config 文件中，修改为 host_key_checking = False  
