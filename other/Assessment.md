@@ -60,9 +60,39 @@
 
 > sudo rm -rf /var/lib/docker
 
-②. 安装和卸载 mysql 
+②. 安装和卸载 mysql (centos7)
 
-1. 
+1. 安装 mysql 需要的源包，并且在本地进行安装。
+
+> wget http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm
+> yum localinstall mysql57-community-release-el7-8.noarch.rpm
+
+2. 检测是否安装成功
+
+> yum repolist enabled | grep "mysql.*-community.*"
+
+3. 安装 mysql server
+
+> yum install mysql-community-server
+
+4. 设置 mysql 开机自启动，并且启动 mysql
+
+> systemctl enable mysqld
+> systemctl start mysqld
+
+卸载 mysql：
+
+- 直接卸载 mysql 
+
+> yum remove mysql
+
+- 使用 rpm 查看，安装中所存在的依赖包
+
+> rpm -qa|grep -i mysql
+
+**如果存在结果，那么就讲所列出的包依次删除，直到没有输出为止**
+
+- 使用 whereis mysql 看是否还有残留
 
 ③. 安装和卸载 go sdk 1.11，jdk 8 ，maven 3.3 
 
