@@ -94,6 +94,8 @@
 
 - 使用 whereis mysql 看是否还有残留
 
+[详情](http://blog.csdn.net/xyang81/article/details/51759200)
+
 ③. 安装和卸载 go sdk 1.11，jdk 8 ，maven 3.3 
 
 - 下载对应的版本的安装包 
