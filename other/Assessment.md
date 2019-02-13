@@ -1,5 +1,7 @@
-考核
+考核内容一： Linux 系统中的安装与卸载
 ===
+day 19-02-12 ...
+---
 **一. Linux系统下的安装与卸载** 
 
 ①. 安装docker CE(ubuntu 和 debain，其他方式参考 [官网](https://docs.docker.com/install/) )：
@@ -123,5 +125,33 @@
 
 1. ”Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this.  Please add this host's fingerprint to your known_hosts file to manage this host“
 
-解决方案：
+**解决方案：**
 在 ansible.config 文件中，修改为 host_key_checking = False  
+
+2. 使用 ssh 连接上能够安装 docker 所需要的依赖，而是用 ansible 却报错误，未能找到安装包。
+
+**解决方案：**
+可能是因为 ansible 中出现了缓存，导致结果，可以重启！
+
+day 19-02-13 ...
+---
+
+上午进行了 ansible 脚本的编写与整体出现的问题如下：
+
+**1. Linux系统：**
+
+①. 向 Linux 文件系统中追加内容，使用:
+
+> echo 'xxxx' >> xx.xx
+
+②. tar 连续接下多个包使用：
+
+> for tar in *.tar.gz; do tar zxvf $tar -C 指定文件夹; done
+
+③. ls 列出项进行分割
+
+> ls xxx | grep xxx
+
+**2. Ansiable 自动运维工具 **
+
+①. Copy model的用法， src 是从本主机到 dest 目标主机 如果加上 / 则是文件夹下所有的文件，如果不则是将整个文件夹全部拷贝到目标主机上。
