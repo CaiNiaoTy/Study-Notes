@@ -130,3 +130,85 @@
         [ - <filepath_glob> ... ]
     
     2.       
+---
+
+2019.02.14
+---
+
+**1. Prometheus Server 安装过程及其说明：**
+
+①. 安装： 
+
+在官网下载安装包，进行解压进入到其中，会有 prometheus 的配置文件，Promtheus作为一个时间序列数据库，其采集的数据会以文件的形似存储在本地中，默认的存储路径为data/，因此我们需要先手动创建该目录：
+
+> mkdir -p data/
+
+> ./prometheus 
+
+②. 说明：
+
+prometheus 可以通过参数修改默认的本地数据存储路径 
+
+> --storage.tsdb.path="data/"
+
+**2. Node Exporter**
+
+①. 在Prometheus的架构设计中，Prometheus Server并不直接服务监控特定的目标，其主要任务负责数据的收集，存储并且对外提供数据查询支持。因此为了能够能够监控到某些东西，如主机的CPU使用率，我们需要使用到Exporter。Prometheus周期性的从Exporter暴露的HTTP服务地址（通常是/metrics）拉取监控样本数据。
+
+②. 采用 Node Exporter 能够监控主机上的 cpu 、内存等资源的使用情况，其中通过其暴露的 HTTP 服务端口（9100）中 metrics 能够获取到检测的数据，并且其中有相应的解释说明：其中HELP用于解释当前指标的含义，TYPE则说明当前指标的数据类型。
+
+> gauge 是仪表盘类型的数据，会随着时间变换 。
+
+③. 增加 Node Exporter 配置，让 Prometheus Server 能够采集到
+
+> 在，prometheus.yml 中找到，scrape_config 增加如下内容：
+ > - job_name: 'node'
+ >   static_configs:
+ >   - targets: ['localhost:9100']
+ 
+在 graph 页面输入 up 如果能够采集到数据，且后面的数字为1，则能够实现。
+
+④. 数据查询使用PromQL，数据可视化可以集成第三方的 grafana 。其有更好的支持！
+
+**3. 任务和实例**
+
+①. 实例定义： 
+
+在Prometheus中，每一个暴露监控样本数据的HTTP服务称为一个实例。例如在当前主机上运行的node exporter可以被称为一个实例(Instance)。
+
+②. 任务定义：
+
+一组用于相同采集目的的实例，或者同一个采集进程的多个副本则通过一个一个任务(Job)进行管理。
+
+**说明： Prometheus 除了静态配置(static_configs)采集实例，还可以通过通过其他方式自动发现实例，并从这些实例中采集数据如集成 k8s 。**
+
+**除了通过使用“up”表达式查询当前所有Instance的状态以外，还可以通过Prometheus UI中的Targets页面查看当前所有的监控采集任务，以及各个任务下所有实例的状态:**
+
+**4. Prometheus 核心组件：** 
+
+①. Prometheus 架构：
+
+![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LBdoxo9EmQ0bJP2BuUi%2F-LPS8BVjkRvEjV8HmbBi%2F-LPS8D1gM9qp1zu_wp8y%2Fprometheus_architecture.png?generation=1540234733609534&alt=media)
+
+②. 核心组件：
+
+- Prometheus Server:
+
+> Prometheus Server是Prometheus组件中的核心部分，负责实现对监控数据的获取，存储以及查询。 Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。其次Prometheus Server需要对采集到的监控数据进行存储，Prometheus Server本身就是一个时序数据库，将采集到的监控数据按照时间序列的方式存储在本地磁盘当中。最后Prometheus Server对外提供了自定义的PromQL语言，实现对数据的查询以及分析。
+Prometheus Server内置的Express Browser UI，通过这个UI可以直接通过PromQL实现数据的查询以及可视化。
+Prometheus Server的联邦集群能力可以使其从其他的Prometheus Server实例中获取数据，因此在大规模监控的情况下，可以通过联邦集群以及功能分区的方式对Prometheus Server进行扩展。
+
+- Exporter
+
+> Exporter将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server，Prometheus Server通过访问该Exporter提供的Endpoint端点，即可获取到需要采集的监控数据。
+一般来说可以将Exporter分为2类：
+直接采集：这一类Exporter直接内置了对Prometheus监控的支持，比如cAdvisor，Kubernetes，Etcd，Gokit等，都直接内置了用于向Prometheus暴露监控数据的端点。
+间接采集：间接采集，原有监控目标并不直接支持Prometheus，因此我们需要通过Prometheus提供的Client Library编写该监控目标的监控采集程序。例如： Mysql Exporter，JMX Exporter，Consul Exporter等。
+
+- Altermanager
+
+> 在Prometheus Server中支持基于PromQL创建告警规则，如果满足PromQL定义的规则，则会产生一条告警，而告警的后续处理流程则由AlertManager进行管理。在AlertManager中我们可以与邮件，Slack等等内置的通知方式进行集成，也可以通过Webhook自定义告警处理方式。AlertManager即Prometheus体系中的告警处理中心。
+
+- PushGateway
+
+> 由于Prometheus数据采集基于Pull模型进行设计，因此在网络环境的配置上必须要让Prometheus Server能够直接与Exporter进行通信。 当这种网络需求无法直接满足时，就可以利用PushGateway来进行中转。可以通过PushGateway将内部网络的监控数据主动Push到Gateway当中。而Prometheus Server则可以采用同样Pull的方式从PushGateway中获取到监控数据。
